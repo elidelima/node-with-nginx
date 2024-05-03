@@ -15,28 +15,32 @@ const dbconfig = {
 (async () => {
     const connection = mysql.createConnection(dbconfig);
     connection.query('DROP TABLE IF EXISTS people');
-    connection.query('CREATE TABLE people(id int not null auto_increment , name varchar(255), primary key(id));');    
+    connection.query('CREATE TABLE people(id int not null auto_increment , name varchar(255), primary key(id));');
     connection.end();
 })();
 
+function getRandomName() {
+    const names = [
+        "Aurora",
+        "Dante",
+        "Eloá",
+        "Ícaro",
+        "Leônidas",
+        "Naiara",
+        "Quiteria",
+        "Ubirajara",
+        "Ximena",
+        "Zacarias"
+    ];
+    return names[Math.floor(Math.random() * names.length)];
+}
+
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
-app.get('/', (req, res) => {
-    res.send(`
-      <form action="/register" method="post">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name">
-        <button type="submit">Register</button>
-        <button type="reset">Reset</button>
-      </form>
-    `);
-});
-
-app.post('/register', async (req, res) => {
-    const insertValues = { name: req.body.name };
+app.get('/', async (req, res) => {
     const connection = mysql.createConnection(dbconfig);
     try {
+        const insertValues = { name: getRandomName() };
         connection.query(`INSERT INTO people SET ?`, insertValues);
 
         connection.query(`SELECT name FROM people`, (error, result) => {
@@ -49,15 +53,15 @@ app.post('/register', async (req, res) => {
                 ${names}
             `);
         });
-        
+
     } catch (error) {
         console.log(error);
         res.status(500).send('Internal Server Error');
     } finally {
         connection.end();
-    } 
+    }
 });
 
 app.listen(port, () => {
-    console.log(`App rodando na porta ${port}`)
+    console.log(`App rodando internamente na porta ${port}`)
 });
